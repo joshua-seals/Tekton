@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  workspaces:
+    - name: source 
+  steps:
+    - name: remove-source
+      image: busybox
+      script: |
+        #!/bin/sh
+        rm -rf $(workspaces.source.path)/source
+        echo "$(workspaces.source.path)/source files deleted."
+
+
+## To use workspace we need a defined pv and pvc

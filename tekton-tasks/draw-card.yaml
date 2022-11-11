@@ -1,0 +1,24 @@
+iapiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: draw-card
+spec:
+  workspaces:
+    - name: deck
+  steps:
+    - name: draw
+      image: jetbrainsinfra/jq
+      script: |
+        #!/bin/sh
+        apk update
+        apk fetch curl
+        apk add curl
+        D=$(cat $(workspaces.deck.path)/deckID.txt)
+        DECKID=$(echo "$D" | tr -d '"')
+        echo Initiating curl https://www.deckofcardsapi.com/api/deck/$DECKID/draw/?count=1
+        curl https://www.deckofcardsapi.com/api/deck/$DECKID/draw/?count=1 > $(workspaces.deck.path)/card.txt
+        echo Finished curl successfully!
+        cat $(workspaces.deck.path)/card.txt | jq '.cards[] | .value + " of " + .suit' > $(workspaces.deck.path)/drawn-card.txt
+        echo Card written to $(workspaces.deck.path) in drawn-card.txt
+        CARD=$(cat $(workspaces.deck.path)/drawn-card.txt)
+        echo $CARD was drawn.

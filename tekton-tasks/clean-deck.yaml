@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clean-card
+spec:
+  workspaces:
+    - name: deck
+  steps:
+    - name: clean
+      image: busybox
+      command:
+        - /bin/sh
+      args:
+        - -c
+        - rm -rf $(workspaces.deck.path)/deck
+    - name: msg
+      image: busybox
+      command:
+        - /bin/sh
+      args:
+        - -c
+        - echo Removed data from workspace.

@@ -1,0 +1,34 @@
+# To run this you will need the workspace setup see tekton-pipelines/workspaces
+# get-deck, draw-card and clean-deck will also need to be applied first. See tekton-tasks folder.
+# Once run ensure workspace is named "card-deck" and choose pvc for storage class. 
+# pvc name will use tekton-pvc
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pick-card-pipe
+spec:
+  workspaces:
+    - name: card-deck
+  tasks:
+    - name: get-deck
+      taskRef:
+        name: get-deck
+      workspaces:
+        - name: deck
+          workspace: card-deck
+    - name: draw-card
+      taskRef:
+        name: draw-card
+      workspaces:
+        - name: deck
+          workspace: card-deck
+      runAfter:
+        - get-deck
+
+  finally:
+  - name: clean-cards
+    taskRef:
+      name: clean-card
+    workspaces:
+      - name: deck
+        workspace: card-deck

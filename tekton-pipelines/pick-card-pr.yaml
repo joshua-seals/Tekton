@@ -1,0 +1,46 @@
+# A PipelineRun can be created to run your pipeline.
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pick-card-
+spec:
+  pipelineRef:
+    name: pick-card-pipe 
+  workspaces:
+    - name: card-deck
+      persistentVolumeClaim:
+        claimName: tekton-pvc
+
+
+# Tasks can also be specified instead like below.
+# 'pipelineSpec' would be appended directly below spec for this. 
+#
+#
+  # pipelineSpec:
+  #   workspaces:
+  #     - name: card-deck
+    # tasks:
+    #   - name: get-deck
+    #     taskRef:
+    #       name: get-deck
+    #     workspaces:
+    #       - name: deck
+    #         workspace: card-deck
+    #   - name: draw-card
+    #     taskRef:
+    #       name: draw-card
+    #     workspaces:
+    #       - name: deck
+    #         workspace: card-deck
+    #     runAfter:
+    #       - get-deck
+  # workspaces:
+  #   - name: card-deck
+  #     volumeClaimTemplate:
+  #       spec:
+  #         accessModes:
+  #           - ReadWriteMany
+  #         resources:
+  #           requests:
+  #             storage: 1Gi
+  #         storageClassName: manual

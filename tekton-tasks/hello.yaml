@@ -1,0 +1,20 @@
+# To run the task below, kubectl apply -f hello.yml
+# tkn task ls -- note hello-world is present. 
+# tkn task start hello-world --showlog
+# you will be prompted for the specific param, called greeting below.
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-world
+spec:
+  params:
+    - name: greeting
+      type: string
+      default: "World"
+  steps:
+    - name: say-hello
+      image: busybox
+      command:
+        - /bin/sh
+      args: ['-c', 'echo hello $(params.greeting)']

@@ -1,0 +1,40 @@
+# NOTE HERE WE HAVE TWO INDIVIDUAL TASKS
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clone
+spec:
+  params:
+    - name: repo 
+      type: string
+      description: Git repo to be cloned 
+      default: https://github.com/hydruga/coffee_api
+  workspaces:
+    - name: source 
+  steps:
+    - name: clone
+      image: alpine/git
+      workingDir: $(workspaces.source.path)
+      command:
+        - /bin/sh
+      args:
+        - '-c'
+        - git clone -v $(params.repo) ./source
+
+--- 
+apiVersion: tekton.dev/v1beta1 
+kind: Task
+metadata:
+  name: list 
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: list 
+      image: alpine 
+      workingDir: $(workspaces.source.path)
+      command:
+        - /bin/sh 
+      args:
+        - '-c'
+        - ls ./source
