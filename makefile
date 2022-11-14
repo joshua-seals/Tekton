@@ -1,3 +1,5 @@
+## 💀💀💀 IF RUNNING MULTIPLE KUBERNETES ENVS DO NOT USE YET 💀💀💀
+
 SHELL := /bin/zsh
 
 KIND_CLUSTER := tekton-testing
@@ -9,14 +11,23 @@ kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
 ###### SETUP THE MAC LOCAL ENV 
-# Install cli tools needed.
+# YOU NEED DOCKER UP AND RUNNING FOR LOCAL ENV.
+# Install cli tools needed. 
 cli.setup.mac:
 	brew update
 	brew list kubectl || brew install kubectl
 	brew list kind || brew install kind
 	brew list tektoncd-cli || brew install tektoncd-cli
 
-
+# SETUP KUBECONFIG ENV
+# If using multiple clusters, the existing cluster will be moved to file called config_old
+# Kind creates and destroys /.kube/config with each kind-up and kind-down command
+# Once the KUBECONFIG env is added to shell, navigate contexts with:
+#			kubectl config use-context [tab|tab]  -- this will show both tekton-testing and older cluster to select from.
+check-kubeconfig:
+	mv $$HOME/.kube/config $$HOME/.kube/config_old
+	echo "export KUBECONFIG=$$HOME/.kube/config:$$HOME/.kube/config_old" >> $$HOME/.zshrc 
+	source $$HOME/.zshrc
  
 ##### 😺 😺 SETUP TEKTON 😺 😺
 # Install Tekton Pipelines 👉 ref: https://tekton.dev/docs/installation/pipelines/
@@ -43,4 +54,4 @@ tekton.setup.mac:
 ## After building the above I became privy to 👉 https://github.com/tektoncd/plumbing/tree/main/hack (tekton_in_kind.sh) can do all of this.
 
 # 🤖 🤖 🤖 🤖 🤖 Install all the above for clean start. 
-all: cli.setup.mac  kind-up tekton.setup.mac
+all: cli.setup.mac check-kubeconfig kind-up tekton.setup.mac
