@@ -1,4 +1,19 @@
-## 💀💀💀 IF RUNNING MULTIPLE KUBERNETES ENVS DO NOT USE YET 💀💀💀
+## This makefile assumes zsh shell 
+## 🐳 FIRST -- Ensure docker desktop is running. 
+
+# SECOND (RUN ONLY ONCE) 
+# 🐚 SETUP KUBECONFIG ENV IN SHELL
+# If using multiple clusters, the existing cluster will be moved to file called config_old
+# Kind creates and destroys /.kube/config with each kind-up and kind-down command
+# Once the KUBECONFIG env is added to shell, navigate contexts with:
+#			kubectl config use-context [tab|tab]  -- this will show both tekton-testing and older cluster to select from.
+check-kubeconfig:
+	mv $$HOME/.kube/config $$HOME/.kube/config_old
+	echo "export KUBECONFIG=$$HOME/.kube/config:$$HOME/.kube/config_old" >> $$HOME/.zshrc 
+	source $$HOME/.zshrc
+
+
+#================================= BELOW SETUP CAN BE RUN VIA "MAKE all" ===================================
 
 SHELL := /bin/zsh
 
@@ -19,15 +34,6 @@ cli.setup.mac:
 	brew list kind || brew install kind
 	brew list tektoncd-cli || brew install tektoncd-cli
 
-# SETUP KUBECONFIG ENV
-# If using multiple clusters, the existing cluster will be moved to file called config_old
-# Kind creates and destroys /.kube/config with each kind-up and kind-down command
-# Once the KUBECONFIG env is added to shell, navigate contexts with:
-#			kubectl config use-context [tab|tab]  -- this will show both tekton-testing and older cluster to select from.
-check-kubeconfig:
-	mv $$HOME/.kube/config $$HOME/.kube/config_old
-	echo "export KUBECONFIG=$$HOME/.kube/config:$$HOME/.kube/config_old" >> $$HOME/.zshrc 
-	source $$HOME/.zshrc
  
 ##### 😺 😺 SETUP TEKTON 😺 😺
 # Install Tekton Pipelines 👉 ref: https://tekton.dev/docs/installation/pipelines/
