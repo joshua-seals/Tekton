@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  description: Task to cleanup persistent volume claim 
+  workspaces:
+    - name: source 
+  steps:
+    - name: remove-source
+      image: busybox
+      script: |
+        #!/bin/sh
+        ls $(workspaces.source.path)/
+        rm -rf $(workspaces.source.path)/*
+        echo "All workspace files deleted."
+
+
+## To use workspace we need a defined pv and pvc
