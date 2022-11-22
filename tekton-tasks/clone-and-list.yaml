@@ -5,21 +5,21 @@ metadata:
   name: clone
 spec:
   params:
-    - name: repo 
+    - name: url 
       type: string
       description: Git repo to be cloned 
       default: https://github.com/hydruga/coffee_api
   workspaces:
-    - name: source 
+    - name: output 
   steps:
     - name: clone
       image: alpine/git
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.output.path)
       command:
         - /bin/sh
       args:
         - '-c'
-        - git clone -v $(params.repo) ./source
+        - git clone -v $(params.url) ./source
 
 --- 
 apiVersion: tekton.dev/v1beta1 

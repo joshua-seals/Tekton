@@ -22,7 +22,7 @@ CLUSTER := minikube
 CLUSTER_NAME := tekton
 
 minikube-up:
-	minikube start --kubernetes-version v1.24.4 --name $(CLUSTER_NAME)
+	minikube start --kubernetes-version v1.24.4 --profile $(CLUSTER_NAME)
 
 minikube-down:
 	minkube delete 

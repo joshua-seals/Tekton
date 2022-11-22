@@ -1,16 +1,19 @@
 # This manifest pipeline takes advantage of tekton hub tasks that already exist.
+# https://hub.tekton.dev
+# These tasks are kaniko and pytest.
+# To install run 'tkn hub install task [task-to-install]' 
 #  
 
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline 
 metadata: 
-  name: tycho-python-pipeline
+  name: python-pipeline
 spec:
   description: >-
    This pipeline pulls source code from a repo, 
-   runs pytest, flak8, pylint tests,
-   builds dockerfile using kaniko and pushes to registry 
-   then cleans up data from the persistant volume claim used for storage between tasks.
+   runs pytest and flake8 in parallel,
+   builds dockerfile using kaniko and pushes image to registry.
+   Finally it cleans up data from the persistant volume claim used for storage between tasks.
   params:
     - name: repo-url
       type: string
@@ -29,12 +32,12 @@ spec:
       default: requirements.txt
     - name: flake-path
       type: string 
-      default: ""
-    
+      default: ""    
   workspaces: 
     - name: shared-data
     - name: docker-credentials
   tasks:
+  ######## CLONE THE REPO ############
     - name: clone-source
       taskRef:
         name: clone
@@ -93,21 +96,23 @@ spec:
     ######### GITHUB ALERT ################
     - name: set-github-status
       taskRef:
-        name: set-github-status
+        name: github-set-status
       workspaces:
         - name: ref-files
           workspace: shared-data 
       runAfter: ["build-and-push"]
-#     ######### SLACK ALERT ###############
+    #
+    ######### SLACK ALERT ###############
+    # TO DO:
     # Slack alert needs to run even if failure from other task
     # Sending the appropriate testing messages to the channel.
-    - name: slack-alert
-      taskRef:
-        name: slack
-      workspaces:
-        - name: source
-          workspace: shared-data 
-      runAfter: ["build-and-push"]
+    # - name: slack-alert
+    #   taskRef:
+    #     name: slack
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-data 
+    #   runAfter: ["build-and-push"]
 # #
 ########## FINALLY POST ALERT AND CLEANUP TASKS ###################
   finally:

@@ -1,0 +1,39 @@
+# NOT USED = BASIC BUILDAH TASK - TRY TEKTON HUB INSTEAD
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah-push
+spec:
+  params:
+    - name: image
+    - name: username
+    - name: password
+  workspaces:
+    - name: source 
+  steps:
+    - name: build-sources
+      image: quay.io/buildah/stable:latest
+      securityContext:
+        privileged: true
+      script: |
+        cd $(workspaces.source.path)/source/
+        buildah bud --layers -t $(params.image) .
+        buildah login -u '$(params.username)' -p '$(params.password)' docker.io 
+        buildah push $(params.image)
+
+###### FOR INJECTION IN PIPELINE
+ # - name: buildah-push 
+    #   taskRef:
+    #     name: buildah-push
+    #   params:
+    #     - name: image 
+    #       value: $(params.image)
+    #     - name: username 
+    #       value: 
+    #     - name: password 
+    #       value: 
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-data
+    #   runAfter:
+    #     - "unit-test"

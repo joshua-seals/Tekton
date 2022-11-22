@@ -24,6 +24,14 @@ spec:
           workspace: card-deck
       runAfter:
         - get-deck
+    - name: draw-card2
+      taskRef:
+        name: draw-card
+      workspaces:
+        - name: deck
+          workspace: card-deck
+      runAfter:
+        - get-deck
 
   finally:
   - name: clean-cards

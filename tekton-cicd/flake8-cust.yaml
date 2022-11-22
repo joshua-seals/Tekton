@@ -1,3 +1,7 @@
+# This is a custom Task used with Flake8.
+# It consists of 2 steps, creating two pods
+# The second step determines if the flake8 linter passed
+#
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
