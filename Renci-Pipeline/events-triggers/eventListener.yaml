@@ -1,0 +1,57 @@
+# Once applying this eventListener object, Tekton will create a 
+# corresponding service which should be attached to your ingress.
+# If running locally, kubectl get services && kubectl port-forward svc/el-listener [port]
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-listener
+spec:
+  serviceAccountName: tekton-triggers-example-sa
+  triggers:
+    - name: github-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: git-secret 
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["pull_request","push"] ## TAKE PUSH OUT ONCE WORKING PROPERLY.
+      bindings:
+        - ref: github-pr-triggerbinding #ref a trigger binding object
+      template:
+        ref: tycho-pipe-triggertemplate
+  # resources:
+  #   kubernetesResource:
+  #     spec:
+  #       template:
+  #         spec: 
+  #           serviceAccountName: tekton-triggers-example-sa
+              
+# secret can be created via:
+#   " export TEKTON_SECRET_TOKEN=${TEKTON_SECRET_TOKEN-$(head -c 24 /dev/random | base64)}"
+#   kubectl create secret generic git-secret --from-literal=secretToken=$TEKTON_SECRET_TOKEN
+# This token will also be used to setup the github webhook.
+
+# THE OPTION BELOW MAY BE THE BEST OPTION FOR INTERCEPTOR IMPLEMENTATION.
+# SEE https://tekton.dev/docs/triggers/interceptors/
+#
+# interceptors:
+#     - name: "validate GitHub payload and filter on eventType"
+#       ref:
+#         name: "github"
+#       params:
+#       - name: "secretRef"
+#         value:
+#           secretName: github-secret
+#           secretKey: secretToken
+#       - name: "eventTypes"
+#         value: ["pull_request"]
+#     - name: "CEL filter: only when PRs are opened"
+#       ref:
+#         name: "cel"
+#       params:
+#       - name: "filter"
+#         value: "body.action in ['opened', 'reopened']"

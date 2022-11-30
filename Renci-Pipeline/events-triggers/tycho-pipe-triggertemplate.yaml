@@ -1,0 +1,43 @@
+# TODO:
+# Make this more generic - so when it runs we don't have to specify just Tycho.
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: tycho-pipe-triggertemplate
+spec:
+  # Describe the params to pass to the pipeline being triggered.
+  params:
+    - name: git-repo-url
+    - name: git-repo-name 
+    - name: sha
+  # Specify pipeline run below referencing
+  # trigger binding params as:
+  # $(tt.params.git-repo-url) for example.
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun 
+    metadata: 
+      generateName: tycho-python-pipeline-
+    spec:
+      pipelineRef:
+        name: ci-python-pipeline
+      # Some values assume the defaults from Pipeline. 
+      # See ci-python-pipeline for full params list.
+      params:
+      - name: repo-url
+        value: $(tt.params.git-repo-url)
+      - name: image
+        value: joshuaseals/tycho-testing
+      - name: versionTag
+        value: v1.0.0-jseals 
+      - name: flake-path
+        value: tycho 
+      workspaces:
+      - name: shared-data # must match workspace name in Task
+        persistentVolumeClaim:
+          claimName: tekton-pvc # this PVC must already exist
+      - name: docker-credentials
+        secret:
+          secretName: docker-password
+

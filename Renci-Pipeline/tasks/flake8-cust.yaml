@@ -1,0 +1,72 @@
+# This is a custom Task used with Flake8.
+# It consists of 2 steps, creating two pods
+# The second step determines if the flake8 linter passed
+#
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: flake8-custom
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Code Quality
+    tekton.dev/tags: python, flake8, linter
+    tekton.dev/displayName: flake8
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This task will run flake8 on the provided input.
+
+  workspaces:
+    - name: source
+  params:
+    - name: image
+      description: The container image with flake8
+      default: python:latest
+    - name: path
+      description: The path to the module which should be analysed by flake8
+      default: "."
+      type: string
+    - name: requirements_file
+      description: The name of the requirements file inside the source location
+      default: "requirements.txt"
+  steps:
+    - name: flake8
+      image: $(params.image)
+      workingDir: $(workspaces.source.path)
+      onError: continue
+      # Here we force exit
+      script: |
+        export PATH=$PATH:$HOME/.local/bin
+        python -m pip install --upgrade pip
+        
+        if [ -e "$(params.requirements_file)" ];then
+            pip install -r $(params.requirements_file)
+            pip install flake8
+        fi
+        mkdir $(workspaces.source.path)/linter
+        python -m flake8 $(params.path) --ignore=E,W >> $(workspaces.source.path)/linter/flake8_results.txt
+    - name: flake8-report
+      image: busybox
+      # Because flake8 runs in parallel with pytest, 
+      # the output of the corrections from linter -
+      # get jumbled without a step to cat saved linting information all at once.
+      script: |
+        #!/bin/sh
+        LINT_RESULTS=$(sed -n '1p' $(workspaces.source.path)/linter/flake8_results.txt)
+        if [ -z "$LINT_RESULTS" ]; then 
+          echo "PASSED"
+          rm -rf $(workspaces.source.path)/linter
+          exit 0
+        else 
+          echo $LINT_RESULTS
+          echo "DID NOT PASS LINTER see below for changes needed."
+          cat $(workspaces.source.path)/linter/flake8_results.txt
+          rm -rf $(workspaces.source.path)/linter
+          exit 1
+        fi
+        
+
+

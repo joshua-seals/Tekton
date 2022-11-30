@@ -1,0 +1,19 @@
+# Trigger Binding will likely be reusable 
+# between all Github hooks, as it parses payload
+# information to pass to triggerTemplates.
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: github-pr-triggerbinding
+spec:
+  # Define needed params from webhook based on github push. 
+  # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+  params:
+    # Here we need: 
+    # repo url, repo name, commit sha, 
+    - name: git-repo-url
+      value: $(body.repository.url)
+    - name: git-repo-name
+      value: $(body.repository)
+    - name: sha
+      value: $(body.sha)

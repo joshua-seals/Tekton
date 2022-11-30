@@ -1,0 +1,14 @@
+# Sanity check to ensure workspace is cleared properly using cleanup.yaml.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: check-pvc
+spec:
+  workspaces:
+  - name: source 
+  steps:
+    - name: build-sources
+      image: busybox
+      command:
+        - /bin/sh
+      args: ['-c', 'ls -al $(workspaces.source.path)']
