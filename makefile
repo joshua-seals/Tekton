@@ -70,4 +70,7 @@ tekton.trigger.setup.mac:
 
 
 # 🤖 Install all the above with exception to "check-kubeconfig"
-all: cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup.mac 
+all: cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac
+
+# Creates a new cluster with pipelines and tekton triggers installed
+new-cluster: $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac

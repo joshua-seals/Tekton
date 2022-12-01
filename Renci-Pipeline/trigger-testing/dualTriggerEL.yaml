@@ -1,0 +1,48 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-listener
+spec:
+  serviceAccountName: tekton-triggers-example-sa
+  triggers:
+    - name: github-python-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: git-secret 
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["pull_request", "push"]
+        - ref:
+            name: cel
+          params:
+            - name: "filter"
+              value: "body.repository.name in ['prod2','prod4']"
+      bindings:
+        - ref: github-pr-triggerbinding
+      template:
+        ref: ci-pipe-triggertemplate-python-build
+###################### DECLARE nodejs trigger ##########################
+    - name: github-nodejs-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: git-secret 
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["pull_request", "push"]
+        - ref:
+            name: cel
+          params:
+            - name: "filter"
+              value: "body.repository.name in ['prod1','prod3','prod5']"
+      bindings:
+        - ref: github-pr-triggerbinding #ref a trigger binding object
+      template:
+        ref: ci-pipe-triggertemplate-nodejs-build

@@ -130,31 +130,31 @@ spec:
 ########## FINALLY POST ALERT AND CLEANUP TASKS ###################
   finally:
     ############## GITHUB ALERT FAIL ################
-    - name: report-pipeline-failure-to-github
-      when:
-        - input: $(tasks.status)
-          operator: in 
-          values: ["Failed", "None"]
-          # see aggregated status https://tekton.dev/docs/pipelines/pipelines/#using-aggregate-execution-status-of-all-tasks
-      taskRef:
-        name: github-set-status-cust
-      params:
-        - name: "STATE"
-          value: "failure"
-        - name: "REPO_FULL_NAME"
-          value: "joshua-seals/tycho-testing"
-        - name: "GITHUB_TOKEN_SECRET_NAME"
-          value: github-pat
-        - name: "GITHUB_TOKEN_SECRET_KEY"
-          value: github-pat
-        - name: "SHA"
-          value: "31e4bf6c03143ef465579458859490cbde250fad"
-        - name: "TARGET_URL"
-          value: "https://tekton-cicd.com/tekton-cd"
-        - name: "CONTEXT"
-          value: "tekton-pipeline"
-        - name: "DESCRIPTION"
-          value: "An error occurred building your commit in Tekton"
+    # - name: report-pipeline-failure-to-github
+    #   when:
+    #     - input: $(tasks.status)
+    #       operator: in 
+    #       values: ["Failed", "None"]
+    #       # see aggregated status https://tekton.dev/docs/pipelines/pipelines/#using-aggregate-execution-status-of-all-tasks
+    #   taskRef:
+    #     name: github-set-status-cust
+    #   params:
+    #     - name: "STATE"
+    #       value: "failure"
+    #     - name: "REPO_FULL_NAME"
+    #       value: "joshua-seals/tycho-testing"
+    #     - name: "GITHUB_TOKEN_SECRET_NAME"
+    #       value: github-pat
+    #     - name: "GITHUB_TOKEN_SECRET_KEY"
+    #       value: github-pat
+    #     - name: "SHA"
+    #       value: "31e4bf6c03143ef465579458859490cbde250fad"
+    #     - name: "TARGET_URL"
+    #       value: "https://tekton-cicd.com/tekton-cd"
+    #     - name: "CONTEXT"
+    #       value: "tekton-pipeline"
+    #     - name: "DESCRIPTION"
+    #       value: "An error occurred building your commit in Tekton"
     # ############## GITHUB ALERT SUCCESS ################
     # - name: report-pipeline-success-to-github
     #   when:

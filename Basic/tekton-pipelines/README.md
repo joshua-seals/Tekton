@@ -1,1 +1,0 @@
-Tekton Pipelines are collections of tasks.
