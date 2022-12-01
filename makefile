@@ -13,11 +13,12 @@ check-kubeconfig:
 	source $$HOME/.zshrc
 
 
-#================================= BELOW SETUP CAN BE RUN VIA "MAKE all" ===================================
+#================================= BELOW SETUP CAN BE RUN VIA "make new-cluster:"  ===================================
 
 SHELL := /bin/zsh
 
-#Enter Cluster preference here. minkube or kind
+# Enter Cluster preference here. minkube or kind
+# Defaults to minikube usage
 CLUSTER := minikube
 CLUSTER_NAME := tekton
 
@@ -49,8 +50,6 @@ cli.setup.mac:
  
 ##### 😺 😺 SETUP TEKTON 😺 😺
 # Install Tekton Pipelines 👉 ref: https://tekton.dev/docs/installation/pipelines/
-# Add tkn auto-completion 
-# Ensure persistance for autocompletion
 # Install Tekton-Dashboard, once installed you will need to run 'kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097' to access.
 
 tekton.pipeline.setup.mac:
@@ -61,16 +60,21 @@ tekton.pipeline.setup.mac:
 	
 	
 # Install Tekton-Triggers and Interceptors. 👉 ref: https://tekton.dev/docs/triggers/install/
-# Install Trigger perms file 👻 **This will need to be looked at particularly for (non-local) tekton implementation, as it does grant cluster-admin priv.
+# Install Trigger perms with rbac demo file
 tekton.trigger.setup.mac:
 	kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
 	kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
 	kubectl apply --filename https://raw.githubusercontent.com/tektoncd/triggers/main/examples/rbac.yaml 
-	
 
 
-# 🤖 Install all the above with exception to "check-kubeconfig"
-all: cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac
+# Install tekton hub tasks used for this demo
+tekton-hub-tasks:
+	tkn hub install task pytest
+	tkn hub install task kaniko
 
-# Creates a new cluster with pipelines and tekton triggers installed
-new-cluster: $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac
+
+# 🛑 🤖 If this is your first time working with this repo, use this 'full-setup-first-time-use'.
+full-setup-first-time-use: check-kubeconfig cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac tekton-hub-tasks
+
+# 🦭🦭 Creates a new cluster with pipelines and tekton triggers installed 🦭🦭
+new-cluster: $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac tekton-hub-tasks
