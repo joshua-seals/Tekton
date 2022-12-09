@@ -26,7 +26,7 @@ minikube-up:
 	minikube start --kubernetes-version v1.24.4 --profile $(CLUSTER_NAME)
 
 minikube-down:
-	minkube delete 
+	minkube delete --profile $(CLUSTER_NAME) 
 
 
 kind-up:

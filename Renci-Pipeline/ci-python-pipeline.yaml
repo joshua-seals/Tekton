@@ -77,21 +77,21 @@ spec:
           workspace: shared-data
     #
     ############# PYTEST ###############
-    - name: unit-test
-      taskRef: 
-        name: pytest
-      params:
-        - name: SOURCE_PATH 
-          #value: "./source/$(params.pytest-path)"
-          value: "$(params.pytest-path)"
-        - name: REQUIREMENTS_FILE
-          #value: "./source/$(params.requirements_file)"
-          value: "$(params.requirements_file)"
-      workspaces:
-        - name: source
-          workspace: shared-data 
-      runAfter:
-        - "clone-source"
+    # - name: unit-test
+    #   taskRef: 
+    #     name: pytest
+    #   params:
+    #     - name: SOURCE_PATH 
+    #       #value: "./source/$(params.pytest-path)"
+    #       value: "$(params.pytest-path)"
+    #     - name: REQUIREMENTS_FILE
+    #       #value: "./source/$(params.requirements_file)"
+    #       value: "$(params.requirements_file)"
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-data 
+    #   runAfter:
+    #     - "clone-source"
     # 
     # ########### FLAKE8 #################
     # - name: linter
@@ -124,7 +124,7 @@ spec:
           value: $(params.image):$(params.versionTag)
         # - name: CONTEXT
         #   value: "."
-      runAfter: ["unit-test"]
+      runAfter: ["clone-source"] # ensure you add the correct tasks here to run after
     #
 # #
 ########## FINALLY POST ALERT AND CLEANUP TASKS ###################
