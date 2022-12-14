@@ -52,7 +52,7 @@ cli.setup.mac:
 # Install Tekton Pipelines 👉 ref: https://tekton.dev/docs/installation/pipelines/
 # Install Tekton-Dashboard, once installed you will need to run 'kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097' to access.
 
-tekton.pipeline.setup.mac:
+tekton.pipeline.setup:
 	kubectl apply --filename \
 		https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 	kubectl apply --filename \
@@ -61,7 +61,7 @@ tekton.pipeline.setup.mac:
 	
 # Install Tekton-Triggers and Interceptors. 👉 ref: https://tekton.dev/docs/triggers/install/
 # Install Trigger perms with rbac demo file
-tekton.trigger.setup.mac:
+tekton.trigger.setup:
 	kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
 	kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
 	kubectl apply --filename https://raw.githubusercontent.com/tektoncd/triggers/main/examples/rbac.yaml 
@@ -74,7 +74,7 @@ tekton-hub-tasks:
 
 
 # 🛑 🤖 If this is your first time working with this repo, use this 'full-setup-first-time-use'.
-full-setup-first-time-use: check-kubeconfig cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac tekton-hub-tasks
+full-setup-first-time-use: check-kubeconfig cli.setup.mac $(CLUSTER)-up tekton.pipeline.setup tekton.trigger.setup tekton-hub-tasks
 
 # 🦭🦭 Creates a new cluster with pipelines and tekton triggers installed 🦭🦭
-new-cluster: $(CLUSTER)-up tekton.pipeline.setup.mac tekton.trigger.setup.mac tekton-hub-tasks
+new-cluster: $(CLUSTER)-up tekton.pipeline.setup tekton.trigger.setup tekton-hub-tasks
