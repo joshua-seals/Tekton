@@ -1,6 +1,6 @@
 ## This makefile assumes zsh shell 
 ## 🐳 FIRST -- Ensure docker desktop is running. 
-
+#
 # SECOND (RUN ONLY ONCE) 
 # 🐚 SETUP KUBECONFIG ENV IN SHELL
 # If using multiple clusters, the existing cluster will be moved to file called config_old
@@ -18,7 +18,7 @@ check-kubeconfig:
 SHELL := /bin/zsh
 
 # Enter Cluster preference here. minkube or kind
-# Defaults to minikube usage
+# Defaults to minikube usage, some kind issues have been observed.
 CLUSTER := minikube
 CLUSTER_NAME := tekton
 
